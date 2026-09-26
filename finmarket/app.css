@@ -1,0 +1,750 @@
+/* app.css — витрина «Финмаркет».
+ *
+ * ВНЕШНИЙ ВИД ЗАДАН РЕШЕНИЕМ Р-92: основной цвет фиолетовый, фон светлый,
+ * углы скруглённые, цифры крупные. Тёмно-синего с золотом нет нигде —
+ * это цвета соседнего проекта, и две иконки рядом в ящике приложений
+ * различались бы только формой.
+ *
+ * КРАСНЫЙ И ЗЕЛЁНЫЙ ЗАНЯТЫ (Р-61). Ими красится ТОЛЬКО движение и потеря:
+ * рост, падение, обесценивание. Ни заголовок, ни кнопка, ни рамка не имеют
+ * права взять этот цвет — иначе зелёная рамка вокруг чего угодно начнёт
+ * читаться как «выгодно».
+ *
+ * Цвет нигде не единственный носитель смысла: у стрелки есть знак и число,
+ * у выбранного чипа — aria-pressed и жирность. Примерно каждый двенадцатый
+ * мужчина не различает красный и зелёный.
+ */
+
+:root {
+  /* ЦВЕТ РАМКИ — #04342C (Р-106, решение владельца 24.09.2026).
+     Заменил фиолетовый Р-92. Рамка — это то, во что вставлены данные:
+     строка состояния, заставка, плашки сверху, выбранная вкладка,
+     выбранный чип. Золото в рамке не используется — золотой на экране
+     принадлежит классу «Золото».
+     Тёмно-зелёный рамки НЕ смешивается с зелёным движения (--rost):
+     светлота рамки 0,11 — ниже порога, с которого цвет читается как
+     «зелёный — вверх», и сторож цвета это проверяет.
+     Нейтральные серые, бывшие лавандовыми, подобраны заново с тем же
+     контрастом к белому, до сотых: читаемость не изменилась. */
+  /* ФИРМЕННЫЙ ЦВЕТ — ОДНА ПЕРЕМЕННАЯ (решение владельца 24.09.2026).
+     Из неё берут плашки доллара и инфляции, нижняя панель, выбранный
+     чип, рамка фокуса. Владелец ещё выбирает между тёмно-зелёным
+     и оранжевым: смена — ОДНА СТРОКА ниже (цвет и текст на нём вместе).
+     На тёмно-зелёном текст белый (13,7:1); на оранжевом белый не
+     проходит 4,5:1 — там текст тёмный #171d1c, в той же строке.
+     Вычислять текст из светлоты фона (lch(from …)) не стали: браузер
+     отдаёт такое значение как lch(100 0 0), и сторож контраста
+     test_zalivki.js его не читает — падал 24.09.2026.
+     Строку состояния и заставку красит не этот файл: meta theme-color
+     в index.html и twa-manifest (пересборка приложения). */
+  --firma: #04342C;  --na-firme: #ffffff;   /* ← ВЫБОР ФИРМЕННОГО ЦВЕТА */
+  --ramka:         var(--firma);
+  --zoloto:        #EF9F27;   /* цвет иконки Р-105: выбранная вкладка */
+  /* Движение НА фирменном тёмном фоне (плашки): зелёный и красный
+     светлые, иначе на #04342C они не видны (--rost там 1,6:1).
+     #7ee2a0 — 8,7:1, #ffa89f — 7,4:1. Смысл тот же (Р-61). */
+  --rost-na-firme:    #7ee2a0;
+  --padenie-na-firme: #ffa89f;
+  --ramka-tjomn:   #022019;
+  --fon:           #f4f7f6;
+  --karta:         #ffffff;
+  --tekst:         #171d1c;
+  --tih:           #61706d;
+  /* «Очень тихий» держал 3,17:1 — ниже нормы 4,5 для мелкого текста:
+     срок вклада «1 год», даты на «Рынке». Так было и до Р-113, нашёл
+     сторож test_zalivki.js. Прошедший норму серый светлее «тихого» быть
+     не может — они почти слились (5,32 против 5,19 на белом). Иерархию
+     подписей теперь держат размер и вес, а не светлота. */
+  --ochen-tih:     #606e6c;
+  --liniya:        #e2e7e6;
+
+  /* Заняты движением и потерями. Больше ничем. */
+  /* Цвета движения ТЕМНЕЕ прежних (#12823f, #c62828): на цветных
+     заливках Р-113 они не держали 4,5:1 — зелёный давал 3,9 на МФК.
+     Взяты самые СВЕТЛЫЕ из проходящих на всех заливках: зелёный темнее
+     нужного подходил бы к тёмно-зелёному рамки, а их смешивать нельзя
+     (Р-106). Смысл цвета не меняется — меняется только светлота. */
+  --rost:          #0e7439;
+  --padenie:       #c12522;
+  /* Нейтральная пара — плашки курса и инфляции и «Под подушкой» (Р-113):
+     это точка отсчёта, а не класс вложений, и цвета у них нет. */
+  --neytral-zalivka: #eeefef;
+  --neytral-ton:     #4a4f4d;
+  --neytral-cifra:   #222524;
+
+  --radius:        18px;
+  --radius-mal:    12px;
+  /* Высота нижней панели. Замерена НА ТЕЛЕФОНЕ: 61 пиксель при подписях
+     в 13 точек. Стояло 60 — ровно на один меньше, и последняя строка
+     страницы упиралась в панель вплотную. На подставленном размере
+     этого не видно: там панель ниже. */
+  --nizhnyaya-h:   64px;
+}
+
+* { box-sizing: border-box; }
+
+/* Атрибут `hidden` обязан прятать ЧТО УГОДНО.
+ *
+ * Правило браузера `[hidden]{display:none}` — самое слабое из всех:
+ * любой `display` по классу его перебивает. Полоса «сети нет» объявлена
+ * как `display:flex`, и при живой сети она висела вверху экрана пустой
+ * жёлтой строкой — с восклицательным знаком и без единого слова, потому
+ * что текст в неё кладут только при показе из кэша. Полоса, которая врёт
+ * про офлайн, хуже отсутствующей полосы.
+ *
+ * Сюда же попадают пустые блоки списка и штора: их прячет тот же атрибут. */
+[hidden] { display: none !important; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--fon);
+  color: var(--tekst);
+  font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        "Helvetica Neue", Arial, sans-serif;
+  /* Плюс запас: панель может подрасти от крупного системного шрифта,
+     а последняя строка страницы не должна прятаться под неё. */
+  padding-bottom: calc(var(--nizhnyaya-h) + 14px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Цифры выравниваются по разрядам: 11,5 под 6,0, а не вразнобой. */
+.cifra-ogromno, .plitka-cifra, .vkl-stavka, .rynok-cifra, .kurs-cifra {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* ------------------------------------------------ шапка: название и язык
+   Фирменный тёмно-зелёный, как панель вкладок: белое на #04342C — 13,7:1.
+   Выбранный язык — белая заливка и тёмно-зелёная надпись (тот же контраст);
+   золото не берётся: оно у выбранной вкладки внизу. Кнопки 44x44. */
+
+.shapka {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 6px 14px;
+  background: var(--firma); color: var(--na-firme);
+}
+.shapka-imya {
+  font-weight: 700; font-size: 18px;
+  -webkit-user-select: none; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.shapka-knopki { display: flex; align-items: center; gap: 8px; }
+.yaz-pereklyuchatel {
+  display: flex;
+  border: 1px solid var(--na-firme); border-radius: 999px; overflow: hidden;
+}
+.yaz-pereklyuchatel button, .shapka-klyuchi {
+  min-width: 44px; min-height: 44px; padding: 0 12px;
+  border: 0; background: transparent; color: var(--na-firme);
+  font: inherit; font-size: 14px; cursor: pointer;
+}
+.yaz-pereklyuchatel button[aria-pressed="true"] {
+  background: var(--na-firme); color: var(--firma); font-weight: 700;
+}
+.shapka-klyuchi { border: 1px dashed var(--na-firme); border-radius: 999px; }
+.shapka-klyuchi[aria-pressed="true"] { border-style: solid; font-weight: 700; }
+
+/* Кыргызский длиннее русского («Банктардын депозиттери»): названия
+   плиток, строки рынка и строка изменения на плашке переносятся, а не
+   обрезаются многоточием — обрезанное название не читается. */
+html[lang="ky"] .plitka-imya,
+html[lang="ky"] .rynok-podpis,
+html[lang="ky"] .plashka-dv,
+html[lang="ky"] .plashka-dv .dvizh { white-space: normal; overflow: visible; }
+
+/* ------------------------------------------------ полоса «сети нет» */
+
+.ofline-polosa {
+  display: flex; gap: 8px; align-items: flex-start;
+  padding: 10px 14px;
+  background: #fff4e0; color: #6b4a10;
+  border-bottom: 1px solid #f0d9ad;
+  font-size: 14px;
+}
+.ofline-znak { font-size: 16px; line-height: 1.3; }
+.ofline-kogda { display: block; color: #8a6a2e; font-size: 13px; }
+
+/* ------------------------------------------------ вкладки-экраны */
+
+.vkladka { padding: 14px 14px 20px; }
+.vkladka[hidden] { display: none; }
+
+/* ------------------------------------------- главная: две плашки (Р-101)
+
+   Обе одного размера и одного спокойного цвета. Инфляция стояла на
+   фиолетовой плашке вдвое крупнее курса — и это читалось как указание,
+   с чем сравнивать. Правила, какая величина главнее, у нас нет: с чем
+   сравнивать, решает человек. */
+
+/* minmax(0, 1fr), а не 1fr. Просто 1fr — это minmax(auto, 1fr): колонка
+   не сжимается уже самого длинного неразрывного слова внутри. Длинное
+   имя плитки («Аренда помещений») распирало правую колонку, и она
+   вылезала за край экрана — на снимке без правой кромки. */
+.plashki { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+
+/* ЗАЛИТЫ ОБЕ, И ЗАЛИТЫ ОДИНАКОВО.
+   Курс и инфляция — те две величины, от которых считается всё остальное
+   на экране, и заливка это подчёркивает. Но подчёркивает ОБЕ: разная
+   заливка вернула бы то, от чего ушли, — указание, с чем сравнивать.
+   Порядок теперь доллар слева, инфляция справа: доллар в Кыргызстане
+   смотрят чаще, и первым читается то, что левее. */
+/* Плашки — ФИРМЕННЫЙ ЦВЕТ ВЕРХНЕЙ ПОЛОСЫ, цифры и подписи белые
+   (решение владельца 24.09.2026; серый Р-113 снят). Белое на #04342C —
+   13,7:1. Движение на плашке — светлыми зелёным и красным. */
+.plashka {
+  background: var(--firma);
+  color: var(--na-firme);
+  border-radius: var(--radius);
+  padding: 12px 14px 14px;
+  min-width: 0;
+}
+.plashka-verh {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 4px; margin-bottom: 2px;
+}
+.plashka-imya {
+  font-size: 14px; opacity: .92;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.plashka-cifra {
+  color: var(--na-firme);
+  font-size: 30px; font-weight: 700; line-height: 1.1;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
+}
+.plashka-ed { font-size: 13px; opacity: .92; }
+.plashka-dt { font-size: 13px; opacity: .8; margin-top: 2px; }
+/* Р-118: строка изменения — под единицей, над датой, одной строкой. */
+.plashka-dv { font-size: 13px; font-weight: 600; margin-top: 2px; white-space: nowrap; }
+.plashka .vopros { color: var(--na-firme); }
+.plashka .vopros::before { background: transparent; border-color: currentColor; }
+.plashka .dvizh.vyshe { color: var(--rost-na-firme); }
+.plashka .dvizh.nizhe { color: var(--padenie-na-firme); }
+
+/* ------------------------------------------------ плитки */
+
+.plitki {
+  list-style: none; margin: 10px 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;
+}
+.plitka {
+  min-width: 0;
+  background: var(--karta);
+  border-radius: var(--radius);
+  padding: 14px;
+  display: flex; flex-direction: column; gap: 2px;
+  text-align: left; width: 100%;
+  border: 0; font: inherit; color: inherit;
+  cursor: pointer;
+}
+/* Ячейка сетки — сам <li>. Без min-width: 0 она не сжимается уже
+   своего содержимого, как и колонка с 1fr. */
+.plitki > li { min-width: 0; }
+/* ЗНАЧОК НАД НАЗВАНИЕМ (решение владельца 23.09.2026). Рядом со
+   значком под имя оставалось 95 px на телефоне шириной 360 — и шесть
+   имён из девяти обрезались многоточием. Над ним — вся ширина плитки. */
+.plitka-verh {
+  display: flex; flex-direction: column; align-items: flex-start;
+  gap: 8px; min-width: 0;
+}
+/* Цвет значка приходит из данных, поэтому здесь задан только запасной:
+   класс без назначенного цвета получит цвет рамки, а не пустоту. */
+.plitka-znak {
+  width: 30px; height: 30px; border-radius: 9px;
+  background: var(--neytral-zalivka); color: var(--neytral-ton);
+  display: flex; align-items: center; justify-content: center; flex: none;
+}
+.plitka-znak svg { width: 18px; height: 18px; fill: currentColor; }
+/* Название класса — ТЁМНОЕ И КРУПНОЕ (Р-101). Было серым и мелким:
+   цвет и вес уходили цифре, а название читалось как подпись к ней.
+   Цвет несёт значок слева, у каждого класса свой. */
+.plitka-imya {
+  font-size: 16px; font-weight: 600; color: var(--tekst);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  min-width: 0; max-width: 100%;
+}
+
+/* «ПОД ПОДУШКОЙ» — ТОЧКА ОТСЧЁТА, а не девятая плитка. Полоса на всю
+   ширину под сеткой. Не залита, как вложения, а обведена: это то,
+   с чем их сравнивают, и стоять с ними наравне оно не должно.
+   Слева значок и имя, под ними подпись; справа цифра. */
+.plitki > li.plitka-otschjot { grid-column: 1 / -1; }
+/* «ПОД ПОДУШКОЙ» — МАЛЕНЬКАЯ ПОЛОСА В ОДНУ СТРОКУ (Р-107): название
+   слева, сумма и потеря справа. Была высокой — значок над именем
+   и крупная цифра делали её выше плиток. */
+.plitka.plitka-otschjot {
+  flex-direction: row; align-items: center; gap: 8px;
+  padding: 10px 14px;
+  /* Полоса — кнопка (за ней «i»), и зона нажатия у неё не меньше 44 px.
+     В одну строку она вышла 42 px — сторож экрана поймал. 48, а не 44:
+     не стоять на пороге (Р-73). */
+  min-height: 48px;
+}
+.plitka-otschjot .plitka-znak { display: none; }
+.plitka-otschjot .plitka-verh { flex: 1 1 auto; min-width: 0; }
+/* На 360 px имени «Под подушкой» не хватало ОДНОГО пикселя (112 нужно,
+   111 было) — браузер рисовал «Под подушк…». Сумма 16 px и промежутки 8
+   дали ровно 112 из 112: многоточие ушло, но запаса ноль. Полоса по
+   решению владельца «маленькая», поэтому и имя в ней мельче плиток. */
+.plitka-otschjot .plitka-cifra { font-size: 16px; margin-top: 0; flex: none; }
+.plitka-otschjot .plitka-imya { font-size: 15px; }
+.plitka-otschjot .plitka-stroka { flex: none; white-space: nowrap; }
+
+/* Единица мелко рядом с крупным числом («1 519 $ за м²»). */
+.plitka-ed { font-size: 14px; font-weight: 600; }
+
+/* ЦВЕТНАЯ ЗАЛИВКА (Р-113): плитка залита светлым своего класса, имя,
+   цифра и подпись — тёмным того же тона. Подписи движения (выше/ниже
+   инфляции) остаются зелёной и красной: это движение, а не класс (Р-61).
+   Контраст выверен расчётом на каждой заливке: текст — не ниже 7:1,
+   подписи движения — не ниже 4,6:1; проверяет test_zalivki.js. */
+.plitka.okrasheno { background: var(--zalivka, var(--karta)); }
+.plitka.okrasheno .plitka-imya,
+.plitka.okrasheno .plitka-cifra { color: var(--ton); }
+.plitka.okrasheno .plitka-stroka:not(.vyshe):not(.nizhe) { color: var(--ton); }
+/* Прочерк — знак, а не текст: ему хватает и приглушённого тона. */
+.plitka.okrasheno .plitka-cifra-net { color: var(--ton); opacity: .55; }
+.plitka.okrasheno .plitka-znak { background: rgba(255,255,255,.72); color: var(--ton); }
+.plitka-cifra { font-size: 28px; font-weight: 700; line-height: 1.15; margin-top: 4px;
+                white-space: nowrap; }
+.plitka-cifra-net { color: var(--ochen-tih); font-weight: 600; }
+.plitka-stroka { font-size: 13px; color: var(--tih); }
+.plitka-stroka.vyshe { color: var(--rost); }
+.plitka-stroka.nizhe { color: var(--padenie); }
+
+/* ------------------------------------------------ чипы */
+
+.chipy-ryad {
+  display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 8px;
+  -webkit-overflow-scrolling: touch;
+}
+.chipy-ryad::-webkit-scrollbar { display: none; }
+.chip {
+  flex: none;
+  border: 1px solid var(--liniya);
+  background: var(--karta);
+  color: var(--tekst);
+  border-radius: 999px;
+  /* 44 на 44 — не пожелание, а нижняя граница попадания пальцем.
+     Чип «$» был 38x36: по ширине мимо на шесть пикселей, по высоте
+     на восемь. Промах по валюте меняет весь список под ним. */
+  min-width: 44px; min-height: 44px;
+  padding: 0 16px;
+  font: inherit; font-size: 14px;
+  cursor: pointer;
+}
+.chip[aria-pressed="true"] {
+  background: var(--ramka); border-color: var(--ramka);
+  color: var(--na-firme); font-weight: 600;
+}
+
+/* ------------------------------------------------ список вкладов */
+
+.spisok-vkladov { list-style: none; margin: 4px 0 0; padding: 0; }
+.vkl-stroka {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; text-align: left;
+  background: var(--karta);
+  border: 0; border-radius: var(--radius-mal);
+  padding: 10px 12px; margin-bottom: 8px;
+  font: inherit; color: inherit; cursor: pointer;
+}
+/* Кружок банка (Р-89): внутри логотип, если он есть в приложении,
+   иначе монограмма. Фон белый — логотипы нарисованы под белое. */
+.kruzhok {
+  width: 42px; height: 42px; border-radius: 50%;
+  flex: none; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  background: #fff; border: 1px solid var(--liniya);
+}
+.kruzhok img { max-width: 84%; max-height: 84%; display: block; }
+.kruzhok.monogramma { color: #fff; font-weight: 700; font-size: 15px; border: 0; }
+.vkl-seredina { flex: 1 1 auto; min-width: 0; }
+/* Названия инструментов крупнее (решение владельца 23.09.2026: «на
+   телефоне мелко»). Было 15 и 13 px. Перенос запрещён и тут, и ниже:
+   имя банка на две строки раздувает строку списка вдвое, и соседние
+   ставки перестают стоять вровень. Не влезло — многоточие, полное
+   имя в карточке. */
+.vkl-bank {
+  font-size: 17px; font-weight: 600;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.vkl-vklad {
+  font-size: 15px; color: var(--tih);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* Кредит вне рейтинга — имя целиком (24.09.2026): пометка «у автоцентров-
+   партнёров банка» в названии и есть причина отдельного блока. */
+.vkl-vklad.celikom { white-space: normal; overflow: visible; }
+.vkl-stroka.kred .vkl-bank { font-size: 16px; }
+.vkl-stroka.kred .vkl-stavka { font-size: 20px; }
+.metka-islam.metka-pered { margin: 0 6px 0 0; }
+/* Заголовок блока внутри списка кредитов: «Льготные программы» и др. */
+.kred-blok-h {
+  list-style: none; font-size: 15px; font-weight: 600; color: var(--tekst);
+  margin: 18px 4px 8px;
+}
+.vkl-pravo { flex: none; text-align: right; }
+.vkl-stavka { font-size: 22px; font-weight: 700; }
+.vkl-stavka-net { font-size: 15px; color: var(--ochen-tih); }
+.vkl-srok { font-size: 14px; color: var(--ochen-tih); white-space: nowrap; }
+.metka-islam {
+  display: inline-block; margin-left: 6px; vertical-align: 1px;
+  font-size: 13px; font-weight: 600;
+  /* Нейтральная, а не светлым тоном рамки: тот зеленоватый (тон 163°),
+     и метка в строке вклада давала бы зелёный фон у данных — Р-113
+     запрещает. Нашёл сторож test_zalivki.js. */
+  color: var(--neytral-ton); background: var(--neytral-zalivka);
+  border-radius: 6px; padding: 1px 5px;
+}
+
+/* ------------------------------------------------ рынок */
+
+.rynok-blok {
+  background: var(--karta); border-radius: var(--radius);
+  padding: 14px; margin-bottom: 10px;
+}
+.rynok-shapka { display: flex; align-items: center; justify-content: space-between; }
+/* Шапка раздела «Рынка» — полосой заливки его класса во всю ширину
+   блока, текст — тёмным того же тона (Р-113). */
+.rynok-blok.okrasheno { padding-top: 0; overflow: hidden; }
+.rynok-blok.okrasheno .rynok-shapka {
+  background: var(--zalivka); margin: 0 -14px 6px; padding: 4px 4px 4px 14px;
+}
+.rynok-blok.okrasheno .rynok-imya,
+.rynok-blok.okrasheno .rynok-shapka .vopros { color: var(--ton); }
+.rynok-imya { font-size: 17px; font-weight: 600; margin: 0; }
+/* СТРОКА «РЫНКА» В ДВА ЯРУСА. Было в один: подпись, движение, цифра
+   и дата стояли рядом, и на подпись оставалось около 36 px — «Слиток
+   100 г» уходил на две строки ещё ДО увеличения шрифта, а «Слиток
+   31,1035 г (тройская унция)» — на четыре.
+   Теперь сверху то, ради чего смотрят: что и сколько. Снизу мельче —
+   движение под именем, дата под цифрой. */
+.rynok-ryad {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 12px; row-gap: 2px; align-items: baseline;
+  padding: 9px 0; border-bottom: 1px solid var(--liniya);
+}
+.rynok-ryad:last-child { border-bottom: 0; }
+/* Подпись ужимается многоточием, цифра — никогда: перенос внутри
+   «250 389,5 с» превращает одно число в два, и глаз читает их как разные. */
+.rynok-podpis {
+  grid-column: 1; grid-row: 1;
+  font-size: 16px; color: var(--tekst);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.rynok-cifra { grid-column: 2; grid-row: 1; font-size: 20px; font-weight: 700;
+               white-space: nowrap; text-align: right; }
+.rynok-cifra-net { font-size: 15px; color: var(--ochen-tih); font-weight: 400; }
+.rynok-ryad .dvizh { grid-column: 1; grid-row: 2; justify-self: start; }
+.rynok-dt { grid-column: 2; grid-row: 2; text-align: right;
+            font-size: 13px; color: var(--ochen-tih); white-space: nowrap; }
+/* Имя продавца над его рядами. Появляется, только когда продавцов
+   больше одного: при одном он обещал бы сравнение, которого нет.
+   Первая строка блока не отбивается сверху — иначе под шапкой
+   «Золото» повисает лишняя щель. */
+.rynok-podzagolovok {
+  font-size: 14px; font-weight: 700; color: var(--tih);
+  letter-spacing: .02em; padding: 12px 0 4px;
+}
+.rynok-podzagolovok:first-of-type { padding-top: 6px; }
+/* Слиток на «Рынке»: имя и дата, под ними три строки — продажа, выкуп,
+   разница (владелец, 26.09.2026). */
+.zoloto-poyasnenie { font-size: 13px; color: var(--tih); margin: 4px 0 2px; }
+.zoloto-slitok { padding: 8px 0 4px; border-bottom: 1px solid var(--liniya); }
+.zoloto-slitok:last-child { border-bottom: 0; }
+.zoloto-slitok-shapka { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.zoloto-slitok-imya { font-size: 16px; font-weight: 600; }
+.zoloto-slitok .rynok-ryad { padding: 4px 0; border-bottom: 0; }
+.zoloto-slitok .rynok-podpis { font-size: 15px; color: var(--tih); }
+.zoloto-slitok .rynok-cifra { font-size: 18px; }
+/* Выкуп одного продавца дороже продажи другого — редкое событие, рамка
+   фирменного цвета. Не красный и не зелёный: это не движение (Р-61). */
+.zoloto-slitok.vygoda { border: 2px solid var(--firma); border-radius: var(--radius-mal);
+                        padding: 8px 10px; margin: 8px 0; }
+.zoloto-vygoda-h { margin: 6px 0 2px; font-weight: 700; color: var(--firma); }
+.zoloto-vygoda-t { margin: 0; font-size: 14px; }
+.dvizh { font-size: 13px; font-weight: 600; white-space: nowrap; flex: none; }
+.dvizh.vyshe { color: var(--rost); }
+.dvizh.nizhe { color: var(--padenie); }
+/* Нейтральное движение (цены золота): направление — стрелкой и знаком,
+   цвет — обычный тёмный текст (владелец, 26.09.2026, рядом с Р-61). */
+.dvizh.neytral { color: var(--neytral-ton); }
+
+/* ------------------------------------------------ ещё */
+
+.eshchjo-punkt {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; text-align: left;
+  background: var(--karta); border: 0; border-radius: var(--radius-mal);
+  padding: 14px; margin-bottom: 8px;
+  font: inherit; color: inherit; cursor: pointer;
+}
+.eshchjo-strelka { color: var(--ochen-tih); }
+a.eshchjo-punkt { text-decoration: none; }
+/* Р-121: карточка «Что нового» на главной — как пункт «Ещё», под плашками. */
+.chto-novoe { margin: 12px 0 4px; min-height: 48px; }
+.chto-novoe[hidden] { display: none; }
+.chto-novoe-tekst { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.chto-novoe-h { font-weight: 600; font-size: 16px; }
+.chto-novoe-svod { font-size: 13px; color: var(--tih); }
+.novoe-ryad { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0;
+  border-bottom: 1px solid var(--liniya); font-size: 15px; }
+.novoe-ryad:last-child { border-bottom: 0; }
+.novoe-chto { min-width: 0; }
+/* «Цена продажи: 24.09 → 25.09» — что за цифры справа и за какие даты. */
+.novoe-mera { display: block; font-size: 13px; color: var(--tih); white-space: normal; margin-bottom: 1px; }
+.novoe-daty { white-space: nowrap; }
+.novoe-cifry { text-align: right; white-space: nowrap; }
+/* Калькулятор в карточке (25.09.2026): кнопка, поле суммы, итог. */
+/* Мелкая строка плитки — цена BTC в долларах (25.09.2026). */
+.plitka-stroka.melko { font-size: 13px; }
+/* Строка «Рынка», которую можно нажать (розничный выпуск, 25.09.2026). */
+.rynok-ryad-knopka { width: 100%; border: 0; background: none; font: inherit; color: inherit;
+  text-align: left; cursor: pointer; padding: 0; min-height: 44px; }
+.kalk { margin: 14px 0 4px; }
+.kalk-knopka { min-height: 48px; padding: 0 22px; border-radius: 24px; border: 0;
+  background: var(--firma); color: var(--na-firme); font: inherit; font-weight: 600; cursor: pointer; }
+.kalk-metka { display: block; font-size: 14px; color: var(--tih); margin-bottom: 10px; }
+.kalk-pole { display: block; width: 100%; box-sizing: border-box; margin-top: 6px;
+  min-height: 48px; padding: 0 12px; font: inherit; font-size: 18px;
+  border: 1px solid var(--liniya); border-radius: var(--radius-mal); background: var(--karta); color: var(--tekst); }
+.kalk-forma[hidden] { display: none; }
+.kalk-obshchiy { margin-top: 12px; }
+.kalk-flag { display: flex; align-items: center; gap: 8px; min-height: 44px; color: var(--tekst); }
+.kalk-flag input { width: 22px; height: 22px; }
+
+/* ------------------------------------------------ Р-127: итог калькулятора и таблица
+   Упрощение (владелец, 26.09.2026): три крупные строки итога, график —
+   под кнопкой, одной простой таблицей без полос. */
+.kalk-rezultat { margin-top: 10px; }
+.kalk-itog { margin: 8px 0; }
+.kalk-itog-stroka { display: flex; justify-content: space-between; align-items: baseline;
+                    gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--liniya); }
+.kalk-itog-stroka:last-child { border-bottom: 0; }
+.kalk-itog-imya { font-size: 16px; color: var(--tih); }
+.kalk-itog-znach { font-size: 22px; font-weight: 700; text-align: right; }
+.kalk-grafik-knopka { min-height: 44px; padding: 0 18px; margin-top: 8px; border-radius: 22px;
+                      border: 1px solid var(--firma); background: var(--karta); color: var(--firma);
+                      font: inherit; font-size: 15px; cursor: pointer; }
+.kalk-grafik { margin-top: 10px; }
+.kalk-tablica-obyortka { max-height: 420px; overflow-y: auto; }
+.kalk-tablica { width: 100%; border-collapse: collapse; font-size: 14px;
+                font-variant-numeric: tabular-nums; }
+.kalk-tablica th { text-align: right; font-weight: 600; color: var(--tih); padding: 6px 4px;
+                   border-bottom: 1px solid var(--liniya); position: sticky; top: 0; background: var(--karta); }
+.kalk-tablica td { text-align: right; padding: 6px 4px; border-bottom: 1px solid var(--liniya); }
+.kalk-tablica th:first-child, .kalk-tablica td:first-child { text-align: left; }
+
+/* ------------------------------------------------ золото: продажа и выкуп — плашками
+   Владелец, 26.09.2026, вечер (Р-129, уточнение): продажа — светло-синий
+   фон, тёмно-синий текст; выкуп — светло-жёлтый фон, тёмно-коричневый
+   текст. Подпись, число и стрелка — внутри плашки, одним цветом.
+   Контраст текста на плашке: продажа 9,6:1, выкуп 9:1. Не зелёный
+   и не красный (Р-61). Так на «Рынке» и в «что нового». */
+:root {
+  --prodazha-fon: #e2edfb; --prodazha-tekst: #0f3a6b;
+  --vykup-fon: #fdf1c0;    --vykup-tekst: #5a3a00;
+}
+.zoloto-slitok .rynok-ryad.zoloto-plashka { border-radius: var(--radius-mal); padding: 6px 10px; margin: 4px 0; }
+.zoloto-plashka.prodazha { background: var(--prodazha-fon); }
+.zoloto-plashka.vykup { background: var(--vykup-fon); }
+.zoloto-plashka.prodazha, .zoloto-plashka.prodazha .rynok-podpis, .zoloto-plashka.prodazha .rynok-cifra,
+.zoloto-plashka.prodazha .dvizh, .zoloto-plashka.prodazha .zoloto-plashka-imya { color: var(--prodazha-tekst); }
+.zoloto-plashka.vykup, .zoloto-plashka.vykup .rynok-podpis, .zoloto-plashka.vykup .rynok-cifra,
+.zoloto-plashka.vykup .dvizh, .zoloto-plashka.vykup .zoloto-plashka-imya { color: var(--vykup-tekst); }
+.zoloto-slitok .zoloto-plashka .rynok-podpis { font-weight: 600; }
+/* «Что нового»: слиток — один блок, две плашки под заголовком. */
+.novoe-slitok { padding: 8px 0; border-bottom: 1px solid var(--liniya); }
+.novoe-slitok:last-child { border-bottom: 0; }
+.novoe-slitok-shapka { display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+                       margin-bottom: 4px; }
+.novoe-slitok-imya { font-weight: 600; }
+.novoe-slitok .zoloto-plashka { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px;
+                                border-radius: var(--radius-mal); padding: 6px 10px; margin: 4px 0; }
+.zoloto-plashka-imya { font-weight: 700; min-width: 64px; }
+.zoloto-plashka-cifra { flex: 1; text-align: right; white-space: nowrap; }
+.novoe-slitok .zoloto-plashka .dvizh { margin-left: auto; }
+
+/* ------------------------------------------------ значок «i» */
+
+/* «?» (Р-115, было «i» по Р-90): всё, что не цифра, живёт во вкладке
+   «Ещё», и значок ведёт в нужный её раздел. Он не должен выглядеть
+   предупреждением: это не тревога, это «подробнее». */
+/* Кружок «i» РИСУЕТСЯ маленьким, а НАЖИМАЕТСЯ большим.
+ *
+ * Значок в 44 пикселя выглядел бы кнопкой и спорил бы с цифрой рядом —
+ * а Р-90 как раз о том, чтобы на экране главной была цифра. Но зона
+ * в 24 пикселя — это промах пальцем, и промах именно по той кнопке,
+ * за которой спрятана вся честность приложения.
+ *
+ * Поэтому кнопка занимает 44 на 44 и прозрачна, а видимый кружок
+ * нарисован подложкой под буквой. Глазами — 24, пальцем — 44. */
+.vopros {
+  position: relative; isolation: isolate;
+  flex: none;
+  width: 44px; height: 44px;
+  border: 0; background: none;
+  color: var(--tih); font: inherit; font-size: 13px; font-weight: 700;
+  line-height: 1; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.vopros::before {
+  content: ''; position: absolute; z-index: -1;
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 1px solid var(--liniya); background: var(--karta);
+}
+
+/* ------------------------------------------------ штора */
+
+.shtora-fon {
+  position: fixed; inset: 0; background: rgba(20,16,40,.42);
+  z-index: 20;
+}
+.shtora-fon[hidden], .shtora[hidden] { display: none; }
+.shtora {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 21;
+  background: var(--karta);
+  border-top: 4px solid transparent;
+  border-radius: 20px 20px 0 0;
+  max-height: 86vh; display: flex; flex-direction: column;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-shadow: 0 -6px 28px rgba(28,20,60,.2);
+}
+/* Штора о классе — полоса его цвета по верхнему краю (Р-113). */
+.shtora.okrasheno { border-top-color: var(--ton); }
+.shtora-ruchka {
+  width: 40px; height: 4px; border-radius: 2px;
+  background: var(--liniya); margin: 8px auto 2px;
+}
+.shtora-shapka {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 6px 16px 8px; border-bottom: 1px solid var(--liniya);
+}
+.shtora-zagolovok { font-size: 17px; margin: 0; flex: 1 1 auto; }
+/* Кольцо фокуса на крестике. Штора при открытии сама ставит фокус на эту
+   кнопку — чтобы клавиатурой и голосовым управлением можно было её
+   закрыть. На телефоне это рисовало чёрное кольцо вокруг крестика при
+   обычном касании: палец фокус не «видит», а кольцо видно. Кольцо
+   оставлено там, где оно нужно — при переходе с клавиатуры. */
+.shtora-zakryt {
+  flex: none; width: 44px; height: 44px; border-radius: 50%;
+  border: 0; background: var(--fon); color: var(--tih);
+  font-size: 22px; line-height: 1; cursor: pointer;
+}
+.shtora-zakryt:focus { outline: none; }
+.shtora-zakryt:focus-visible { outline: 2px solid var(--ramka); outline-offset: 2px; }
+.shtora-telo { overflow-y: auto; padding: 12px 16px 20px; }
+.shtora-telo p { margin: 0 0 10px; font-size: 14px; color: var(--tekst); }
+.shtora-telo p.tih { color: var(--tih); }
+.shtora-telo h3 {
+  font-size: 14px; margin: 16px 0 6px; color: var(--tih);
+  font-weight: 600;
+}
+.shtora-telo ul { margin: 0 0 10px; padding-left: 18px; font-size: 14px; }
+.shtora-telo li { margin-bottom: 6px; }
+/* Ссылка на источник — тоже зона нажатия, и по ней действительно
+   нажимают: это единственный выход из приложения к первоисточнику.
+   Строчной ссылке в 19 пикселей высоты попасть пальцем нельзя. */
+.shtora-telo a {
+  color: var(--ramka-tjomn);
+  display: inline-flex; align-items: center;
+  min-height: 44px;
+}
+
+/* Карточка вклада: пары «что — сколько». */
+.usl { margin: 0; }
+.usl-para {
+  display: flex; gap: 12px; align-items: baseline;
+  padding: 9px 0; border-bottom: 1px solid var(--liniya);
+}
+.usl-para:last-child { border-bottom: 0; }
+/* Название условия ужимается, значение — нет. На телефоне при 46 %
+   под название «14 % годовых» переносилось на две строки, и главная
+   цифра карточки читалась как две. */
+.usl-imya { font-size: 14px; color: var(--tih); flex: 0 0 38%; }
+.usl-znach { font-size: 15px; flex: 1 1 auto; min-width: 0; }
+.usl-glavnoe .usl-znach { font-size: 24px; font-weight: 700; white-space: nowrap; }
+
+/* Таблица ОСП и КУП у исламских вкладов: источник печатает её таблицей,
+   и пересказ своими словами был бы уже не цитатой. */
+.osp-tablica { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 10px; }
+.osp-tablica td { border: 1px solid var(--liniya); padding: 5px 7px; vertical-align: top; }
+.osp-tablica tr:first-child td { background: var(--fon); font-weight: 600; }
+.osp-obertka { overflow-x: auto; }
+
+/* ------------------------------------------------ нижняя панель */
+
+.nizhnyaya {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 15;
+  /* Пять вкладок (Р-108): Главная, Вклады, Рынок, Кредиты, Ещё.
+     minmax(0, 1fr) — чтобы длинная подпись не распирала колонку. */
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+  background: var(--firma);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+/* ПАНЕЛЬ ВКЛАДОК (решение владельца 24.09.2026, вторая редакция):
+ * серого нет. Панель и невыбранные вкладки — фирменный тёмно-зелёный,
+ * подписи и значки на нём белые (13,7:1). ВЫБРАННАЯ — ЗОЛОТО #EF9F27:
+ * золотые значок и подпись на тёмно-зелёном (6,3:1), жирная подпись
+ * и золотая полоса сверху — чтобы выбор читался не одним цветом.
+ * Почему не залить вкладку золотом: оттенок золота 36°, а фон с тоном
+ * 0–45° — это «красный» по правилу Р-61/Р-113 (красным и зелёным фоном
+ * красится только движение), и test_zalivki.js это ловит. Золото на
+ * белом (первая редакция, v43) — 2,2:1, не проходит 4,5:1. */
+.vk-knopka {
+  position: relative;
+  border: 0; background: none; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 8px 0 7px; color: var(--na-firme); font: inherit;
+}
+.vk-znak svg { fill: currentColor; display: block; }
+.vk-imya { font-size: 13px; }
+.vk-knopka[aria-current="page"] { color: var(--zoloto); }
+.vk-knopka[aria-current="page"] .vk-imya { font-weight: 700; }
+.vk-knopka[aria-current="page"]::before {
+  content: ''; position: absolute; top: 0; left: 18%; right: 18%;
+  height: 4px; border-radius: 0 0 4px 4px; background: var(--zoloto);
+}
+.vk-knopka:focus { outline: none; }
+.vk-knopka:focus-visible { outline: 2px solid currentColor; outline-offset: -3px; }
+
+/* ------------------------------------------------ прочее */
+
+.podval-stroka {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--tih);
+  margin: 14px 0 0;
+}
+.razdel-vnizu { margin-top: 22px; }
+.razdel-h { font-size: 17px; margin: 0 0 2px; }
+/* Заголовок раздела и его «i» в одну строку — как у блоков «Рынка». */
+.razdel-shapka { display: flex; align-items: center; justify-content: space-between; }
+/* Внутри раздела — полоса его цвета сверху (Р-113). Вкладка «Вклады» —
+   раздел вкладов банков. */
+.vkladka.okrasheno { border-top: 4px solid var(--ton); }
+/* Шапки разделов внизу вкладки — полосой заливки, текст тёмным тоном. */
+.razdel-vnizu.okrasheno > .razdel-shapka,
+.razdel-vnizu.okrasheno > .razdel-h {
+  background: var(--zalivka); color: var(--ton);
+  border-radius: var(--radius-mal); padding: 4px 4px 4px 12px; margin-bottom: 8px;
+}
+.razdel-vnizu.okrasheno > .razdel-h { padding: 12px; }
+.razdel-vnizu.okrasheno .razdel-h,
+.razdel-vnizu.okrasheno .razdel-shapka .vopros { color: var(--ton); }
+.razdel-vnizu.okrasheno > .razdel-shapka .razdel-h { margin: 0; }
+.razdel-podpis { font-size: 13px; color: var(--tih); margin: 0 0 8px; }
+
+.pusto {
+  background: var(--karta); border-radius: var(--radius);
+  padding: 20px 16px; text-align: center;
+}
+.pusto-h { font-size: 16px; font-weight: 600; margin: 0 0 6px; }
+.pusto-text { font-size: 14px; color: var(--tih); margin: 0; }
+
+@media (min-width: 560px) {
+  .plitki { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .shtora { left: 50%; transform: translateX(-50%); max-width: 560px;
+            border-radius: 20px 20px 0 0; }
+}
