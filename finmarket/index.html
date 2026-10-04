@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="description" content="Финмаркет — ставки и цены финансовых инструментов Кыргызской Республики из открытых источников">
+<title>Финмаркет</title>
+<meta name="theme-color" content="#04342C">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<!-- ШАПКА: название и язык (решение владельца 26.09.2026).
+     «Кырг | Рус», по умолчанию русский. Кнопка «ключи» (номера строк
+     таблицы перевода) скрыта: пять нажатий подряд на «Финмаркет». -->
+<header class="shapka" data-bez-perevoda>
+  <span class="shapka-imya" id="shapka-imya">Финмаркет</span>
+  <span class="shapka-knopki">
+    <button type="button" class="shapka-klyuchi" id="shapka-klyuchi" hidden>ключи</button>
+    <span class="yaz-pereklyuchatel" role="group" aria-label="Язык / Тил">
+      <button type="button" data-yaz="ky" lang="ky">Кырг</button><button type="button" data-yaz="ru">Рус</button>
+    </span>
+  </span>
+</header>
+
+<!-- ПОЛОСА «СЕТИ НЕТ». Показывается ТОЛЬКО когда data.json пришёл из кэша
+     service worker'а. Старые цифры без этой полосы не показываются.
+     Р-90 убрал с экрана оговорки — эту не убрал и убрать не может:
+     она говорит не о том, откуда цифра, а о том, что цифра несегодняшняя.
+     Это меняет решение человека, а не объясняет его. -->
+<div id="ofline-polosa" class="ofline-polosa" role="status" hidden>
+  <span class="ofline-znak" aria-hidden="true">&#9888;</span>
+  <span class="ofline-text">
+    <b id="ofline-glavnoe"></b>
+    <span id="ofline-kogda" class="ofline-kogda"></span>
+  </span>
+</div>
+
+<main id="scena">
+
+<!-- ======================= ГЛАВНАЯ ======================= -->
+<section id="vk-glavnaya" class="vkladka" aria-label="Главная">
+
+  <!-- ДВЕ РАВНЫЕ ПЛАШКИ (Р-101). Инфляция больше не выделяется размером
+       и цветом: она такая же величина, как курс, и ставить её на голову
+       выше значило бы говорить, что сравнивать надо именно с ней.
+       Человек сам решает, с чем сравнивать. -->
+  <div class="plashki">
+    <div class="plashka">
+      <div class="plashka-verh">
+        <span class="plashka-imya" id="g-usd-imya">Доллар</span>
+        <button type="button" class="vopros" data-razdel="metodika"
+                aria-label="Пояснения к курсу: «Ещё», раздел «Методика»">?</button>
+      </div>
+      <div class="plashka-cifra" id="g-usd-znachenie">&mdash;</div>
+      <div class="plashka-ed" id="g-usd-edinica"></div>
+      <div class="plashka-dv" id="g-usd-dv"></div>
+      <div class="plashka-dt" id="g-usd-data"></div>
+    </div>
+    <div class="plashka">
+      <div class="plashka-verh">
+        <span class="plashka-imya" id="g-inf-imya">Инфляция</span>
+        <button type="button" class="vopros" data-razdel="metodika"
+                aria-label="Пояснения к инфляции: «Ещё», раздел «Методика»">?</button>
+      </div>
+      <div class="plashka-cifra" id="g-inf-znachenie">&mdash;</div>
+      <div class="plashka-ed" id="g-inf-edinica"></div>
+      <div class="plashka-dv" id="g-inf-dv"></div>
+      <div class="plashka-dt" id="g-inf-data"></div>
+    </div>
+  </div>
+
+  <ul id="plitki" class="plitki"></ul>
+
+  <p class="podval-stroka" id="g-sformirovano"></p>
+</section>
+
+<!-- ======================= ВКЛАДЫ ======================= -->
+<section id="vk-vklady" class="vkladka" aria-label="Вклады" hidden>
+
+  <div class="chipy-ryad" id="chipy-valyuty" role="group" aria-label="Валюта вклада"></div>
+  <div class="chipy-ryad" id="chipy-sroka" role="group" aria-label="Срок вклада"></div>
+
+  <ul id="spisok-vkladov" class="spisok-vkladov"></ul>
+
+  <!-- Р-115: пустое сочетание — прочерк. Почему пусто — в «Ещё»,
+       раздел «Вклады банков»: рядом с цифрами пояснений нет. -->
+  <div id="vkl-pusto" class="pusto" hidden>
+    <p class="pusto-h">—</p>
+  </div>
+
+  <!-- Бессрочные вклады: срока нет вовсе, в корзины не попадают.
+       Отдельным разделом внизу списка, а не вперемешку с ним. -->
+  <section id="bessrochnye" class="razdel-vnizu" hidden>
+    <div class="razdel-shapka">
+      <h2 class="razdel-h">Бессрочные вклады</h2>
+      <button type="button" class="vopros" data-razdel="deposit_bank"
+              aria-label="Пояснения: «Ещё», раздел «Вклады банков»">?</button>
+    </div>
+    <ul id="bessrochnye-spisok" class="spisok-vkladov"></ul>
+  </section>
+
+  <p class="podval-stroka">
+    <span id="vkl-svod"></span>
+    <button type="button" class="vopros" data-razdel="deposit_bank"
+            aria-label="Как собран список: «Ещё», раздел «Вклады банков»">?</button>
+  </p>
+
+  <!-- Вклады МФК — ОТДЕЛЬНЫМ разделом ниже банков, а не вперемешку
+       с ними: это другой по природе и по риску инструмент, и складывать
+       их в один список значило бы предлагать сравнивать несравнимое. -->
+  <section id="mfo" class="razdel-vnizu">
+    <h2 class="razdel-h">Вклады МФК</h2>
+    <ul id="mfo-spisok" class="spisok-vkladov"></ul>
+    <p class="podval-stroka">
+      <span id="mfo-svod"></span>
+      <button type="button" class="vopros" data-razdel="deposit_mfo"
+              aria-label="Пояснения: «Ещё», раздел «Вклады МФК»">?</button>
+    </p>
+  </section>
+</section>
+
+<!-- ======================= КРЕДИТЫ (Р-108) ======================= -->
+<section id="vk-kredity" class="vkladka" aria-label="Кредиты" hidden>
+  <div class="chipy-ryad" id="chipy-kred-valyuty" role="group" aria-label="Валюта кредита"></div>
+  <div class="chipy-ryad" id="chipy-kred-vida" role="group" aria-label="Вид кредита"></div>
+  <div class="razdel-shapka">
+    <h2 class="razdel-h">Кредиты банков</h2>
+    <button type="button" class="vopros" data-razdel="kredity"
+            aria-label="Пояснения: «Ещё», раздел «Кредиты»">?</button>
+  </div>
+  <ul id="kred-spisok" class="spisok-vkladov"></ul>
+  <div id="kred-pusto" class="pusto">
+    <p class="pusto-h">—</p>
+  </div>
+
+  <!-- Кредиты МФК — ОТДЕЛЬНЫМ разделом ниже банков, как вклады МФК:
+       другой по природе и по цене инструмент, в один список с банками
+       его не кладут. -->
+  <section id="kred-mfo" class="razdel-vnizu">
+    <div class="razdel-shapka">
+      <h2 class="razdel-h">Кредиты МФК</h2>
+      <button type="button" class="vopros" data-razdel="kredity"
+              aria-label="Пояснения: «Ещё», раздел «Кредиты»">?</button>
+    </div>
+    <ul id="kred-mfo-spisok" class="spisok-vkladov"></ul>
+    <div id="kred-mfo-pusto" class="pusto">
+      <p class="pusto-h">—</p>
+    </div>
+  </section>
+</section>
+
+<!-- ======================= РЫНОК ======================= -->
+<section id="vk-rynok" class="vkladka" aria-label="Рынок" hidden>
+  <div id="rynok"></div>
+</section>
+
+<!-- ======================= ЕЩЁ ======================= -->
+<section id="vk-eshchjo" class="vkladka" aria-label="Ещё" hidden>
+  <div id="eshchjo"></div>
+</section>
+
+</main>
+
+<!-- ШТОРА. Одна на всё приложение: и карточка вклада, и любое «i».
+     Выезжает снизу поверх экрана, экран под ней остаётся на месте —
+     спуска по уровням с кнопкой «назад» больше нет (Р-91). -->
+<div id="shtora-fon" class="shtora-fon" hidden></div>
+<div id="shtora" class="shtora" role="dialog" aria-modal="true"
+     aria-labelledby="shtora-zagolovok" hidden>
+  <div class="shtora-ruchka" aria-hidden="true"></div>
+  <div class="shtora-shapka">
+    <h2 id="shtora-zagolovok" class="shtora-zagolovok"></h2>
+    <button type="button" id="shtora-zakryt" class="shtora-zakryt"
+            aria-label="Закрыть">&times;</button>
+  </div>
+  <div id="shtora-telo" class="shtora-telo"></div>
+</div>
+
+<nav class="nizhnyaya" id="nizhnyaya" aria-label="Разделы приложения">
+  <button type="button" class="vk-knopka" data-vkladka="vk-glavnaya" aria-current="page">
+    <span class="vk-znak" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="24" height="24"><path d="M4 13h4v7H4zM10 8h4v12h-4zM16 4h4v16h-4z"/></svg>
+    </span>
+    <span class="vk-imya">Главная</span>
+  </button>
+  <button type="button" class="vk-knopka" data-vkladka="vk-vklady">
+    <span class="vk-znak" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="24" height="24"><path d="M3 7h18v3H3zM3 12h18v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1zM12 2l9 4H3z"/></svg>
+    </span>
+    <span class="vk-imya">Вклады</span>
+  </button>
+  <button type="button" class="vk-knopka" data-vkladka="vk-rynok">
+    <span class="vk-znak" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="24" height="24"><path d="M3 17l5-6 4 4 5-7 4 5v5H3z"/><path d="M3 20h18v1H3z"/></svg>
+    </span>
+    <span class="vk-imya">Рынок</span>
+  </button>
+  <button type="button" class="vk-knopka" data-vkladka="vk-kredity">
+    <span class="vk-znak" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="24" height="24"><path d="M3 6h18v12H3z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 9h18v2.4H3zM6 14h5v1.6H6z"/></svg>
+    </span>
+    <span class="vk-imya">Кредиты</span>
+  </button>
+  <button type="button" class="vk-knopka" data-vkladka="vk-eshchjo">
+    <span class="vk-znak" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="24" height="24"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+    </span>
+    <span class="vk-imya">Ещё</span>
+  </button>
+</nav>
+
+<noscript>
+  <p class="pusto-text" style="padding:16px">
+    Приложению нужен JavaScript: цифры читаются из файла data.json.
+  </p>
+</noscript>
+
+<script>
+/* Язык витрины (yazyk.js). скрыт: true — переключатель убран, только
+ * русский: так будет, если владелец не подтвердит перевод к сроку. */
+window.ЯЗЫК_НАСТРОЙКИ = { ключ: 'finmarket-yazyk', поУмолчанию: 'ru', ключи: false, скрыт: false };
+</script>
+<script src="yazyk.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
