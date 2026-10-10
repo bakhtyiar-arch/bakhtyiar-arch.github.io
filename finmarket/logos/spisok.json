@@ -1,0 +1,231 @@
+{
+ "abank": {
+  "байт": 3590,
+  "банк": "АБанк",
+  "вес": 900,
+  "домены": [
+   "ab.kg",
+   "abank.kg"
+  ],
+  "исходных_байт": 3590,
+  "откуда": "https://abank.kg/_next/static/media/logo.ff74537b.svg",
+  "тип": "image/svg+xml",
+  "файл": "abank.svg"
+ },
+ "abn": {
+  "байт": 3056,
+  "банк": "АБН",
+  "вес": 1000,
+  "домены": [
+   "abn.kg"
+  ],
+  "исходных_байт": 3056,
+  "откуда": "https://static.tildacdn.net/tild6533-3739-4165-a130-316634356433/icon.svg",
+  "тип": "image/svg+xml",
+  "файл": "abn.svg"
+ },
+ "bankasia": {
+  "байт": 2410,
+  "банк": "Банк Азии",
+  "вес": 900,
+  "домены": [
+   "bankasia.kg"
+  ],
+  "исходных_байт": 2410,
+  "откуда": "https://www.bankasia.kg/wp-content/themes/gtm/images/logo-ky.svg",
+  "тип": "image/svg+xml",
+  "файл": "bankasia.svg"
+ },
+ "baytushum": {
+  "байт": 6151,
+  "банк": "Бай-Тушум",
+  "вес": 900,
+  "домены": [
+   "baitushum.kg"
+  ],
+  "исходных_байт": 6151,
+  "откуда": "https://www.baitushum.kg/wp-content/themes/baitushum-new/images/logobtb_ru.svg",
+  "тип": "image/svg+xml",
+  "файл": "baytushum.svg"
+ },
+ "capitalbank": {
+  "байт": 5568,
+  "банк": "Капитал Банк",
+  "вес": 120,
+  "домены": [
+   "capitalbank.kg"
+  ],
+  "исходных_байт": 7879,
+  "откуда": "https://capitalbank.kg/images/logo.png",
+  "тип": "image/png",
+  "файл": "capitalbank.png"
+ },
+ "demirbank": {
+  "байт": 8294,
+  "банк": "ДКИБ",
+  "вес": 120,
+  "домены": [
+   "demirbank.kg"
+  ],
+  "исходных_байт": 4215,
+  "откуда": "https://demirbank.kg/assets/db_logo-67e513b6.png",
+  "тип": "image/png",
+  "файл": "demirbank.png"
+ },
+ "doscredobank": {
+  "байт": 8498,
+  "банк": "Дос-Кредобанк",
+  "вес": 32,
+  "домены": [
+   "dcb.kg"
+  ],
+  "исходных_байт": 4286,
+  "откуда": "https://www.dcb.kg/static/img/favicons/favicon-32x32.png",
+  "тип": "image/png",
+  "файл": "doscredobank.png"
+ },
+ "eldik": {
+  "байт": 5617,
+  "банк": "Элдик Банк",
+  "вес": 1000,
+  "домены": [
+   "eldik.kg"
+  ],
+  "исходных_байт": 4286,
+  "откуда": "https://eldik.kg/favicon.ico",
+  "тип": "image/png",
+  "файл": "eldik.png"
+ },
+ "eletcapital": {
+  "байт": 10013,
+  "банк": "Элет-Капитал",
+  "вес": 900,
+  "домены": [
+   "elet.kg"
+  ],
+  "исходных_байт": 10013,
+  "откуда": "https://elet.kg/media/templates/site/eletkg/images/logo.svg",
+  "тип": "image/svg+xml",
+  "файл": "eletcapital.svg"
+ },
+ "esb": {
+  "байт": 4349,
+  "банк": "ЕСБ",
+  "вес": 120,
+  "домены": [
+   "esb.kg"
+  ],
+  "исходных_байт": 192876,
+  "откуда": "https://www.esb.kg/images/esb2/logo_ru4.png",
+  "тип": "image/png",
+  "файл": "esb.png"
+ },
+ "fkb": {
+  "байт": 5155,
+  "банк": "ФКБ",
+  "вес": 120,
+  "домены": [
+   "fkb.kg"
+  ],
+  "исходных_байт": 106537,
+  "откуда": "https://www.fkb.kg/shared/icons/fcb_main_logo.png",
+  "тип": "image/png",
+  "файл": "fkb.png"
+ },
+ "kicb": {
+  "байт": 10903,
+  "банк": "КИКБ",
+  "вес": 192,
+  "домены": [
+   "kicb.net"
+  ],
+  "исходных_байт": 4552,
+  "откуда": "https://kicb.net/upload/dev2fun.imagecompress/webp/local/templates/kicb/kicb_html/html/images/favicons/android-chrome-192x192.webp",
+  "тип": "image/png",
+  "файл": "kicb.png"
+ },
+ "kkb": {
+  "байт": 2793,
+  "банк": "Кыргызкоммерцбанк",
+  "вес": 180,
+  "домены": [
+   "kkb.kg"
+  ],
+  "исходных_байт": 3799,
+  "откуда": "https://kkb.kg/logo.png",
+  "тип": "image/png",
+  "файл": "kkb.png"
+ },
+ "ksbc": {
+  "байт": 4517,
+  "банк": "КБ КСБ",
+  "вес": 180,
+  "домены": [
+   "ksbc.kg"
+  ],
+  "исходных_байт": 6575,
+  "откуда": "https://www.ksbc.kg/static/assets/favicons/apple-touch-icon.8353db989a68.png",
+  "тип": "image/png",
+  "файл": "ksbc.png"
+ },
+ "mbank": {
+  "байт": 2433,
+  "банк": "Мбанк",
+  "вес": 1000,
+  "домены": [
+   "mbank.kg"
+  ],
+  "исходных_байт": 2433,
+  "откуда": "https://mbank.kg/_next/static/media/favicon2.c2389d75.svg",
+  "тип": "image/svg+xml",
+  "файл": "mbank.svg"
+ },
+ "obank": {
+  "байт": 3952,
+  "банк": "О!Банк",
+  "вес": 180,
+  "домены": [
+   "obank.kg"
+  ],
+  "исходных_байт": 4907,
+  "откуда": "https://obank.kg/favicon/apple-touch-icon.png",
+  "тип": "image/png",
+  "файл": "obank.png"
+ },
+ "optima": {
+  "байт": 7196,
+  "банк": "Оптима Банк",
+  "вес": 180,
+  "домены": [
+   "optimabank.kg"
+  ],
+  "исходных_байт": 5288,
+  "откуда": "https://optimabank.kg/media/templates/site/optimabankkg/images/favicon.png",
+  "тип": "image/png",
+  "файл": "optima.png"
+ },
+ "salymfinance": {
+  "байт": 7409,
+  "банк": "Салым Финанс",
+  "вес": 1000,
+  "домены": [
+   "salymfinance.kg"
+  ],
+  "исходных_байт": 7409,
+  "откуда": "https://salymfinance.kg/icons/favicon.svg",
+  "тип": "image/svg+xml",
+  "файл": "salymfinance.svg"
+ },
+ "tolubay": {
+  "байт": 6848,
+  "банк": "Толубай",
+  "вес": 120,
+  "домены": [
+   "tolubaybank.kg"
+  ],
+  "исходных_байт": 72831,
+  "откуда": "https://www.tolubaybank.kg/images/design/logo.png",
+  "тип": "image/png",
+  "файл": "tolubay.png"
+ }
+}
