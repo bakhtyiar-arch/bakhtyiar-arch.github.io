@@ -1,0 +1,15 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "kg.finmarket.app",
+      "sha256_cert_fingerprints": [
+        "94:4D:54:2A:D3:7C:89:CD:96:E7:DF:F7:34:0A:19:D3:7C:6F:E9:D6:4D:D7:0E:07:7E:CC:1D:62:5E:B9:48:C1",
+        "7E:A7:DD:37:E1:66:12:2F:A7:21:08:33:EF:0E:C8:CF:88:84:0E:3B:AF:FA:BA:A2:F5:05:8D:13:0F:04:5F:D2"
+      ]
+    }
+  }
+]
